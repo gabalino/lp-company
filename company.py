@@ -227,8 +227,5 @@ def main():
     print(list2str(12, get_lastname_ends(departments, letters='aeiouy')))
 
 
-# 12. Вывести без повторений имена людей, чьи фамилии заканчиваются на гласную букву.
-
-
 if __name__ == '__main__':
     main()
