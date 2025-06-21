@@ -56,3 +56,146 @@ taxes = [
     {"department": "IT Department", "name": "hiring", "value_percents": 6},
     {"department": "BizDev Department", "name": "sales", "value_percents": 20},
 ]
+
+
+def convert_list_to_str(number: int, data: list) -> str:
+    list_str = [str(element) for element in data]
+    result = f'#{number}\n {"\n ".join(list_str)}'
+    return result
+
+
+def convert_dict_to_str(number: int, data: dict) -> str:
+    result = f'#{number}\n '
+    result += "\n ".join([f'{key}: {value}' for key, value in data.items()])
+    return result
+
+
+def get_name(data: dict) -> str:
+    name = f"{data.get('first_name')} {data.get('last_name')}"
+    return name
+
+
+def get_gender(firstname) -> str:
+    result = 'unknown'
+    male = ['Daniel', 'Kevin', 'Brian']
+    female = ['Michelle', 'Nicole', 'Christina', 'Caitlin']
+    if firstname in male:
+        result = 'male'
+    elif firstname in female:
+        result = 'female'
+    return result
+
+
+def get_departments(data: list[dict]) -> list:
+    result = []
+    for department in data:
+        result.append(department.get('title', ''))
+    return result
+
+
+def get_names(data: list) -> list:
+    result = []
+    for department in data:
+        for employer in department.get('employers'):
+            result.append(get_name(employer))
+    return result
+
+
+def get_names_department(data: list) -> list:
+    result = []
+    for department in data:
+        for employer in department.get('employers'):
+            record = f"{get_name(employer)}: {department.get('title', '')}"
+            result.append(record)
+    return result
+
+
+def get_names_salary_more(data: list, salary=0) -> list:
+    result = []
+    for department in data:
+        for employer in department.get('employers'):
+            if employer.get('salary_rub', 0) > salary:
+                result.append(get_name(employer))
+    return result
+
+
+def get_position_with_salary(data: list, salary: int, param: str) -> list:
+    result = []
+    for department in data:
+        for employer in department.get('employers'):
+            if param == 'less':
+                if employer.get('salary_rub', 0) < salary:
+                    result.append(employer.get('position', ''))
+            elif param == 'more':
+                if employer.get('salary_rub', 0) > salary:
+                    result.append(employer.get('position', ''))
+    return list(set(result))
+
+
+def get_salary_department(data: list) -> dict[str, int]:
+    result = {}
+    for department in data:
+        title = department.get('title', '')
+        for employer in department.get('employers'):
+            result[title] = result.get(title, 0) + employer.get('salary_rub', 0)
+    return result
+
+
+def get_salary_param(data: list, param: str) -> dict[str, int]:
+    result = {}
+    for department in data:
+        title = department.get('title', '')
+        for employer in department.get('employers'):
+            employer_salary = employer.get('salary_rub', 0)
+            department_salary = result.get(title, 0)
+            if department_salary == 0:
+                result[title] = employer_salary
+            elif param == 'min':
+                if employer_salary < department_salary:
+                    result[title] = employer_salary
+            elif param == 'max':
+                if employer_salary > department_salary:
+                    result[title] = employer_salary
+    return result
+
+
+def get_salary_avg(data: list, gender: str = '') -> list:
+    result = []
+    count, total = 0, 0
+    for department in data:
+        count += len(department)
+        for employer in department.get('employers'):
+            if not gender:
+                total += employer.get('salary_rub', 0)
+            elif get_gender(employer['first_name']) == gender:
+                total += employer.get('salary_rub', 0)
+    result.append(total / count)
+    return result
+
+
+def get_lastname_ends(data: list, letters=''):
+    result = []
+    for department in data:
+        for employer in department.get('employers'):
+            if employer['last_name'][-1] in letters:
+                result.append(employer['first_name'])
+    return list(set(result))
+
+
+def main():
+    print(convert_list_to_str(1, get_departments(departments)))
+    print(convert_list_to_str(2, get_names(departments)))
+    print(convert_list_to_str(3, get_names_department(departments)))
+    print(convert_list_to_str(4, get_names_salary_more(departments, 100000)))
+    print(convert_list_to_str(5, get_position_with_salary(departments, 80000, 'less')))
+    print(convert_dict_to_str(6, get_salary_department(departments)))
+    print(convert_dict_to_str(7, get_salary_param(departments, 'min')))
+    # print(convert_dict_to_str(8, get_salary_param(departments, 'all')))
+    print(convert_list_to_str(9, get_salary_avg(departments)))
+    print(convert_list_to_str(10, get_position_with_salary(departments, 90000, 'more')))
+    print(convert_list_to_str(11, get_salary_avg(departments, gender='female')))
+    print(convert_list_to_str(12, get_lastname_ends(departments, letters='aeiouy')))
+
+
+if __name__ == '__main__':
+    main()
